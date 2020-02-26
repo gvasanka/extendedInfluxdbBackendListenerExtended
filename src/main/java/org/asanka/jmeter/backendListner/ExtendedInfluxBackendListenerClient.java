@@ -1,4 +1,4 @@
-package com.asanka.jmeter.backendListner;
+package org.asanka.jmeter.backendListner;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.jmeter.config.Arguments;
@@ -8,6 +8,7 @@ import org.apache.jmeter.visualizers.backend.AbstractBackendListenerClient;
 import org.apache.jmeter.visualizers.backend.BackendListenerContext;
 import org.apache.jmeter.visualizers.backend.SamplerMetric;
 import org.apache.jmeter.visualizers.backend.UserMetric;
+import org.apache.jorphan.util.JMeterStopTestException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -101,13 +102,26 @@ public class ExtendedInfluxBackendListenerClient extends AbstractBackendListener
     @Override
     public void run() {
         sendMetrics();
+        log.info("Just hit here 1111111111111111");
+        log.info(application);
+    }
+
+    protected void checkApplicationName(String provideappName) throws Exception{
+        log.info(application);
+        String syscoApplictionName="WWW";
+        if(syscoApplictionName.equals(provideappName)){
+            log.info("Match  33333333");
+        }else{
+            log.info("Let fail 444444");
+            throw new JMeterStopTestException("Provided application name"+ provideappName+ "is not correct, Select "+syscoApplictionName+" as application Name");
+        }
     }
 
     /**
      * Send metrics
      */
     protected void sendMetrics() {
-
+        log.info("at sendMetrics 9999999999");
         synchronized (LOCK) {
             for (Map.Entry<String, SamplerMetric> entry : getMetricsInfluxdbPerSampler().entrySet()) {
                 SamplerMetric metric = entry.getValue();
@@ -150,6 +164,7 @@ public class ExtendedInfluxBackendListenerClient extends AbstractBackendListener
      *            {@link SamplerMetric}
      */
     private void addMetrics(String transaction, SamplerMetric metric) {
+        log.info("at addMetrics 999999999");
         // FOR ALL STATUS
         addMetric(transaction, metric.getTotal(), metric.getSentBytes(), metric.getReceivedBytes(), TAG_ALL, metric.getAllMean(), metric.getAllMinTime(),
                 metric.getAllMaxTime(), allPercentiles.values(), metric::getAllPercentile);
@@ -165,6 +180,7 @@ public class ExtendedInfluxBackendListenerClient extends AbstractBackendListener
     }
 
     private void addErrorMetric(String transaction, String responseCode, String responseMessage, long count) {
+        log.info("at addErrorMetric 99999999999");
         if (count > 0) {
             StringBuilder tag = new StringBuilder(70);
             tag.append(TAG_APPLICATION).append(application);
@@ -183,6 +199,7 @@ public class ExtendedInfluxBackendListenerClient extends AbstractBackendListener
                            Long sentBytes, Long receivedBytes,
                            String statut, double mean, double minTime, double maxTime,
                            Collection<Float> pcts, PercentileProvider percentileProvider) {
+        log.info("at addMetric  9999999");
         if (count > 0) {
             StringBuilder tag = new StringBuilder(95);
             tag.append(TAG_APPLICATION).append(application);
@@ -216,6 +233,7 @@ public class ExtendedInfluxBackendListenerClient extends AbstractBackendListener
     }
 
     private void addCumulatedMetrics(SamplerMetric metric) {
+        log.info("at addCumulatedMetrics 9999999999");
         int total = metric.getTotal();
         if (total > 0) {
             StringBuilder tag = new StringBuilder(70);
@@ -266,6 +284,7 @@ public class ExtendedInfluxBackendListenerClient extends AbstractBackendListener
 
     @Override
     public void handleSampleResults(List<SampleResult> sampleResults, BackendListenerContext context) {
+        log.info("handleSampleResults   999999999");
         synchronized (LOCK) {
             UserMetric userMetrics = getUserMetrics();
             for (SampleResult sampleResult : sampleResults) {
@@ -283,11 +302,21 @@ public class ExtendedInfluxBackendListenerClient extends AbstractBackendListener
 
     @Override
     public void setupTest(BackendListenerContext context) throws Exception {
+        log.info("At setupTest 999999999 ");
         String influxdbMetricsSender = context.getParameter("influxdbMetricsSender");
         String influxdbUrl = context.getParameter("influxdbUrl");
+
+
+
         summaryOnly = context.getBooleanParameter("summaryOnly", false);
         samplersRegex = context.getParameter("samplersRegex", "");
         application = ExtendedAbstractInfluxdbMetricsSender.tagToStringValue(context.getParameter("application", ""));
+
+        log.info("4444  --- User Povided details "+influxdbMetricsSender+influxdbUrl+" :::::::"+application);
+
+        checkApplicationName(application);
+
+
         measurement = ExtendedAbstractInfluxdbMetricsSender
                 .tagToStringValue(context.getParameter("measurement", DEFAULT_MEASUREMENT));
         testTitle = context.getParameter("testTitle", "Test");
@@ -405,6 +434,8 @@ public class ExtendedInfluxBackendListenerClient extends AbstractBackendListener
     public Arguments getDefaultParameters() {
         Arguments arguments = new Arguments();
         DEFAULT_ARGS.forEach(arguments::addArgument);
+        log.info("at getDefaultParameters 99999999999");
+        log.info(DEFAULT_ARGS.get("application"));
         return arguments;
     }
 

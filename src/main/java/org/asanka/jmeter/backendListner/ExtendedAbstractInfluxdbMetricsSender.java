@@ -16,7 +16,7 @@
  *
  */
 
-package com.asanka.jmeter.backendListner;
+package org.asanka.jmeter.backendListner;
 
 /**
  * Base class for {@link ExtendedInfluxdbMetricsSender}

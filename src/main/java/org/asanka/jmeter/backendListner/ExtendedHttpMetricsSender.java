@@ -16,7 +16,7 @@
  *
  */
 
-package com.asanka.jmeter.backendListner;
+package org.asanka.jmeter.backendListner;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpResponse;
