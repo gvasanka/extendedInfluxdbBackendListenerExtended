@@ -7,3 +7,5 @@ Extended influxdb Backend Listener to control which data to ship to the DB
 
 
 Trying to customize the existing JMeter influx BackendListner to customize sending details
+
+Improve README later
